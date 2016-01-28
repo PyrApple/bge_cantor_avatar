@@ -2,5 +2,7 @@
 *.swp
 .DS_Store
 __pycache__
-
+*.blend1
+*.blend2
 /utils
+blender/assets/olds

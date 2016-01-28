@@ -45,6 +45,12 @@ class NetworkIO:
         if self.connected:
             self.network_param['socket'].close()
 
+            # remove callback to avoid calling a closed socket at BGE's end (avoid OSError)
+            # TODO: no ID based removal, must make sure to remove _bufferInData method
+            # (e.g. will fail if another method has been added to scene callback after _bufferInData)
+            scene = logic.getCurrentScene()
+            del scene.pre_draw[0]
+
 
 
     def _getSocket(self,ip,port, bufferSize = 0, timeOut = 0.001):
@@ -75,7 +81,7 @@ class NetworkIO:
             self._data = decodeOSC(raw_data)
             del self._data[1] # delete OSC header / weird sfff symbols, etc.
 
-        except socket.timeout: # OSError when socket has been closed (last call before end of BGE)
+        except socket.timeout: # scene = logic.getCurrentScene() when socket has been closed (last call before end of BGE)
             pass
 
 

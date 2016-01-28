@@ -25,9 +25,12 @@ class Human():
         scene = bge.logic.getCurrentScene()
         self.bones = {}
         for ob in scene.objects:
-            if self._name in ob.name: # TO BE MODIFIED FOR A MULTI-AVATAR SETUP
+            if self._name in ob.name:
                 bone = Bone(ob, vowel_list)
                 self.bones[ob.name] = bone
+
+        if bge.logic.debug:
+            print('registered human:', self._name)
 
     def updateVowels(self, vowel_xy):
         """
@@ -43,6 +46,7 @@ class Human():
 
             for bone in self.bones.values():
                 bone.kxObj[key] = self._vowel_gains[key]
+                # print(self._name, key, self._vowel_gains)
 
 class Bone():
     """
@@ -57,7 +61,7 @@ class Bone():
             self.kxObj[v] = 0.0
 
         if bge.logic.debug:
-            print('registered bone:', self.kxObj.name)
+            print('-> registered bone:', self.kxObj.name)
 
 
 #########################################################################
@@ -91,7 +95,8 @@ def init(controller):
             avatar_name = 'George'
             bge.logic.avatar_dict[avatar_name] = Human(avatar_name, vowel_list)
             # -- Avatar 2 - ...
-            # ...
+            avatar_name = 'Henri'
+            bge.logic.avatar_dict[avatar_name] = Human(avatar_name, vowel_list)
 
             # Set OSC parameters / socket
             ip = '127.0.0.1'
@@ -128,8 +133,13 @@ def run(controller):
         vowel_xy = (data_in[2], data_in[3])
 
         # Feed in vowel data to relevant avatar
-        bge.logic.avatar_dict[data_in[0]].updateVowels(vowel_xy)
-        if bge.logic.debug: print('feed in {0}: ({1},{2}) to {3}'.format(data_type, vowel_xy[0], vowel_xy[1], avatar_name))
+        try:
+            bge.logic.avatar_dict[data_in[0]].updateVowels(vowel_xy)
+        except KeyError:
+            if bge.logic.debug: print('receiving data for non-instanciated avatar named: {0}'.format(avatar_name))
+
+        # if bge.logic.debug: print('feed in {0}: ({1},{2}) to {3}'.format(data_type, vowel_xy[0], vowel_xy[1], avatar_name))
+
 
 
 def end():
@@ -146,17 +156,17 @@ def end():
     logic.endGame()
 
 
-def updateBone(controller):
-    """
-    run for bone objects to invoke:
-    way to acess controller (hence animation acuator)
-    """
+# def updateBone(controller):
+#     """
+#     run for bone objects to invoke:
+#     way to acess controller (hence animation acuator)
+#     """
 
-    if hasattr(bge.logic, 'avatar_dict'):
+#     if hasattr(bge.logic, 'avatar_dict'):
 
-        # acitvate all actuators (to be sync. with current property value)
-        for act in controller.actuators:
-            controller.activate(act)
+#         # acitvate all actuators (to be sync. with current property value)
+#         for act in controller.actuators:
+#             controller.activate(act)
 
 
 
