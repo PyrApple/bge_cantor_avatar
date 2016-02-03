@@ -5,4 +5,5 @@ __pycache__
 *.blend1
 *.blend2
 /utils
+blender/utils
 blender/assets/olds
